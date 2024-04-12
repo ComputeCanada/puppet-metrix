@@ -101,7 +101,7 @@ LOGINS = {
     },
 <% } -%>
 }
-DTNS = None
+DTNS = { }
 
 AMORTIZATION_YEARS = None
 CPU_CORE_COST_PER_HOUR = None
