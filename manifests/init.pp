@@ -5,7 +5,7 @@ class trailblazing_turtle (
   Integer $prometheus_port,
   String $db_ip,
   Integer $db_port,
-  Array[String] $logins,
+  Struct $logins,
   String $domain_name,
   String $base_dn,
   String $ldap_password,
