@@ -1,4 +1,5 @@
 class trailblazing_turtle (
+  String $version,
   String $root_api_token,
   String $password,
   String $prometheus_ip,
@@ -12,12 +13,15 @@ class trailblazing_turtle (
   String $slurm_password,
   String $cluster_name,
 ) {
-  include trailblazing_turtle::install
+  class { 'trailblazing_turtle::install':
+    version => $version,
+  }
 
   file { '/var/www/userportal/userportal/settings/99-local.py':
     show_diff => false,
     content   => epp('trailblazing_turtle/99-local.py',
       {
+        'version'         => $version,
         'password'        => $password,
         'slurm_password'  => $slurm_password,
         'cluster_name'    => $cluster_name,

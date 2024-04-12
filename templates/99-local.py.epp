@@ -61,7 +61,13 @@ ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
 PROMETHEUS = {
     'url': 'http://<%= $prometheus_ip %>:<%= $prometheus_port %>',
     'headers': {},
+<% if versioncmp($version, '1.3.1') >= 0 { -%>
+    'filter': {
+        "default": "cluster='<%= $cluster_name %>'"
+    }
+<% } else { -%>
     'filter': "",
+<% } -%>
 }
 
 STATIC_URL = '/static/'
