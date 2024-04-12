@@ -89,8 +89,8 @@ EXPORTER_SAMPLING_RATE = {
 CLUSTER_NAME = '<%= $cluster_name %>'  # used for slurm DB name
 LUSTRE_FS_NAMES = None
 LOGINS = {
-<% $logins.each |$key, $values| { -%>
-    '<%= $key %>': {
+<% $logins.each |$hostname| { -%>
+    '<%= $hostname %>': {
         'network_interface': 'eth0',
     },
 <% } -%>
