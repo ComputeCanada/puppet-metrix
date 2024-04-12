@@ -53,7 +53,7 @@ class trailblazing_turtle (
   }
 
   file { '/etc/httpd/conf.d/userportal.conf':
-    content => epp('profile/userportal/userportal.conf.epp'),
+    content => epp('trailblazing_turtle/userportal.conf.epp'),
     seltype => 'httpd_config_t',
     notify  => Service['httpd'],
   }

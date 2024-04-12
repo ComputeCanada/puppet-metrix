@@ -24,7 +24,7 @@ class trailblazing_turtle::slurm_jobscripts (
 
   file { '/etc/systemd/system/slurm_jobscripts.service':
     mode   => '0644',
-    source => 'puppet:///modules/profile/userportal/slurm_jobscripts.service',
+    source => 'puppet:///modules/trailblazing_turtle/slurm_jobscripts.service',
     notify => Service['slurm_jobscripts'],
   }
 
