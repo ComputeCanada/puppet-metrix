@@ -5,24 +5,22 @@ class trailblazing_turtle (
   Integer $prometheus_port,
   String $db_ip,
   Integer $db_port,
+  Array[String] $logins,
+  String $domain_name,
+  String $base_dn,
+  String $ldap_password,
+  String $slurm_password,
+  String $cluster_name,
 ) {
-  $instances = lookup('terraform.instances')
-  $logins = $instances.filter |$keys, $values| { 'login' in $values['tags'] }
-
-  include profile::userportal::install_tarball
-
-  $domain_name = lookup('profile::freeipa::base::domain_name')
-  $int_domain_name = "int.${domain_name}"
-  $base_dn = join(split($int_domain_name, '[.]').map |$dc| { "dc=${dc}" }, ',')
-  $admin_password = lookup('profile::freeipa::server::admin_password')
+  include trailblazing_turtle::install
 
   file { '/var/www/userportal/userportal/settings/99-local.py':
     show_diff => false,
-    content   => epp('profile/userportal/99-local.py',
+    content   => epp('trailblazing_turtle/99-local.py',
       {
         'password'        => $password,
-        'slurm_password'  => lookup('profile::slurm::accounting::password'),
-        'cluster_name'    => lookup('profile::slurm::base::cluster_name'),
+        'slurm_password'  => $slurm_password,
+        'cluster_name'    => $cluster_name,
         'secret_key'      => seeded_rand_string(32, $password),
         'domain_name'     => $domain_name,
         'subdomain'       => 'explore',
@@ -32,19 +30,19 @@ class trailblazing_turtle (
         'db_ip'           => $db_ip,
         'db_port'         => $db_port,
         'base_dn'         => $base_dn,
-        'ldap_password'   => $admin_password,
+        'ldap_password'   => $ldap_password,
       }
     ),
     owner     => 'apache',
     group     => 'apache',
     mode      => '0600',
-    require   => Class['profile::userportal::install_tarball'],
+    require   => Class['trailblazing_turtle::install'],
     notify    => [Service['httpd'], Service['gunicorn-userportal']],
   }
 
   file { '/var/www/userportal/userportal/local.py':
     source  => 'file:/var/www/userportal/example/local.py',
-    require => Class['profile::userportal::install_tarball'],
+    require => Class['trailblazing_turtle::install'],
     notify  => Service['gunicorn-userportal'],
   }
 
@@ -62,14 +60,14 @@ class trailblazing_turtle (
 
   file { '/etc/systemd/system/gunicorn-userportal.service':
     mode   => '0644',
-    source => 'puppet:///modules/profile/userportal/gunicorn-userportal.service',
+    source => 'puppet:///modules/trailblazing_turtle/gunicorn-userportal.service',
     notify => Service['gunicorn-userportal'],
   }
 
   service { 'gunicorn-userportal':
     ensure  => 'running',
     enable  => true,
-    require => Class['profile::userportal::install_tarball'],
+    require => Class['trailblazing_turtle::install'],
   }
 
   exec { 'userportal_migrate':
@@ -81,7 +79,7 @@ class trailblazing_turtle (
     refreshonly => true,
     subscribe   => [
       Mysql::Db['userportal'],
-      Class['profile::userportal::install_tarball'],
+      Class['trailblazing_turtle::install'],
       File['/var/www/userportal/userportal/settings/99-local.py'],
       File['/var/www/userportal/userportal/local.py'],
     ],
@@ -97,7 +95,7 @@ class trailblazing_turtle (
     require => [
       File['/var/www/userportal/userportal/settings/99-local.py'],
       File['/var/www/userportal/userportal/local.py'],
-      Class['profile::userportal::install_tarball'],
+      Class['trailblazing_turtle::install'],
     ],
     creates => [
       '/var/www/userportal-static/admin',

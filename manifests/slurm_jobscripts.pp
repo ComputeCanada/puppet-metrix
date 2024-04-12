@@ -28,7 +28,7 @@ class trailblazing_turtle::slurm_jobscripts (
     notify => Service['slurm_jobscripts'],
   }
 
-  $portal_version = lookup('profile::userportal::install_tarball::version')
+  $portal_version = lookup('trailblazing_turtle::install::version')
   file { '/opt/software/slurm/bin/slurm_jobscripts.py':
     mode    => '0755',
     source  => "https://raw.githubusercontent.com/guilbaults/TrailblazingTurtle/v${portal_version}/slurm_jobscripts/slurm_jobscripts.py",

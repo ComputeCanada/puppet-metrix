@@ -1,4 +1,4 @@
-class profile::userportal::install (String $version) {
+class trailblazing_turtle::install (String $version) {
   ensure_packages(['python38', 'python38-devel'])
   ensure_packages(['openldap-devel', 'gcc', 'mariadb-devel'])
 
