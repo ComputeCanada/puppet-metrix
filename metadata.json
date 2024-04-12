@@ -1,7 +1,7 @@
 {
     "name": "puppet-trailblazing_turtle",
     "version": "0.1.0",
-    "author": "Félix-Antoine Fortin",
+    "author": "Félix-Antoine Fortin, Simon Guilbault",
     "summary": "Install, configure, and manage Trailblazing Turtle user portal",
     "license": "MIT",
     "source": "https://github.com/ComputeCanada/puppet-trailblazing_turtle",
