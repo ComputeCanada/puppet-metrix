@@ -2,8 +2,7 @@ class trailblazing_turtle::install (
   String $version,
   String $python_version = '3.8',
 ) {
-  $python_pkg_version = regsubst($python_version, /\./, '', 'G')
-  $python_packages = ["python${python_pkg_version}", "python${python_pkg_version}-devel"]
+  $python_packages = ["python${python_version}", "python${python_version}-devel"]
 
   ensure_packages($python_packages)
   ensure_packages(['openldap-devel', 'gcc', 'mariadb-devel'])
