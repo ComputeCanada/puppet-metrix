@@ -12,6 +12,7 @@ class trailblazing_turtle (
   String $ldap_password,
   String $slurm_password,
   String $cluster_name,
+  String $subdomain,
 ) {
   class { 'trailblazing_turtle::install':
     version => $version,
@@ -27,7 +28,7 @@ class trailblazing_turtle (
         'cluster_name'    => $cluster_name,
         'secret_key'      => seeded_rand_string(32, $password),
         'domain_name'     => $domain_name,
-        'subdomain'       => 'explore',
+        'subdomain'       => $subdomain,
         'logins'          => $logins,
         'prometheus_ip'   => $prometheus_ip,
         'prometheus_port' => $prometheus_port,
