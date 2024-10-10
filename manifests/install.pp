@@ -1,12 +1,17 @@
-class trailblazing_turtle::install (String $version) {
-  ensure_packages(['python38', 'python38-devel'])
+class trailblazing_turtle::install (
+  String $version,
+  String $python_version = '3.8',
+) {
+  $python_pkg_version = regsubst($python_version, /\./, '', 'G')
+  $python_packages = ["python${python_pkg_version}", "python${python_pkg_version}-devel"]
+
+  ensure_packages($python_packages)
   ensure_packages(['openldap-devel', 'gcc', 'mariadb-devel'])
 
-  # Using python3.8 with gunicorn
   exec { 'userportal_venv':
-    command => '/usr/bin/python3.8 -m venv /opt/software/userportal-env',
+    command => "/usr/bin/python${python_version} -m venv /opt/software/userportal-env",
     creates => '/opt/software/userportal-env',
-    require => Package['python38'],
+    require => Package[$python_packages],
   }
 
   exec { 'userportal_upgrade_pip':
@@ -53,7 +58,7 @@ class trailblazing_turtle::install (String $version) {
     require     => [
       Exec['userportal_venv'],
       Exec['userportal_upgrade_pip'],
-      Package['python38-devel'],
+      Package[$python_packages],
       Package['mariadb-devel'],
       Package['openldap-devel'],
       Package['gcc'],
@@ -66,7 +71,7 @@ class trailblazing_turtle::install (String $version) {
       '/opt/software/userportal-env/bin',
       '/usr/bin',
     ],
-    creates => '/opt/software/userportal-env/lib/python3.8/site-packages/django_pam/__init__.py',
+    creates => "/opt/software/userportal-env/lib/python${python_version}/site-packages/django_pam/__init__.py",
     require => [
       Exec['userportal_venv'],
       Exec['userportal_upgrade_pip'],
