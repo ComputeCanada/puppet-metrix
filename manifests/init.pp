@@ -14,9 +14,7 @@ class trailblazing_turtle (
   String $cluster_name,
   String $subdomain,
 ) {
-  class { 'trailblazing_turtle::install':
-    version => $version,
-  }
+  include trailblazing_turtle::install
 
   file { '/var/www/userportal/userportal/settings/99-local.py':
     show_diff => false,
@@ -42,7 +40,6 @@ class trailblazing_turtle (
     group     => 'apache',
     mode      => '0600',
     require   => Class['trailblazing_turtle::install'],
-    notify    => [Service['httpd'], Service['gunicorn-userportal']],
   }
 
   file { '/var/www/userportal/userportal/local.py':
@@ -60,7 +57,6 @@ class trailblazing_turtle (
   file { '/etc/httpd/conf.d/userportal.conf':
     content => epp('trailblazing_turtle/userportal.conf.epp'),
     seltype => 'httpd_config_t',
-    notify  => Service['httpd'],
   }
 
   file { '/etc/systemd/system/gunicorn-userportal.service':

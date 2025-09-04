@@ -1,11 +1,15 @@
 {
     "name": "puppet-trailblazing_turtle",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "author": "Félix-Antoine Fortin, Simon Guilbault",
     "summary": "Install, configure, and manage Trailblazing Turtle user portal",
     "license": "MIT",
     "source": "https://github.com/ComputeCanada/puppet-trailblazing_turtle",
     "project_page": "https://github.com/ComputeCanada/puppet-trailblazing_turtle",
     "issues_url": "https://github.com/ComputeCanada/puppet-trailblazing_turtle/issues",
-    "dependencies": [ ]
+    "dependencies": [
+       { "name": "puppet/archive", "version_requirement": ">= 5.0.0"  },
+       { "name": "puppetlabs/stdlib", "version_requirement": ">= 5.2.0" },
+       { "name": "cmdntrf/uv", "version_requirement": ">= 0.1.0" }
+    ]
 }
