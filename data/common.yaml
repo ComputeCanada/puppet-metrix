@@ -1,1 +1,2 @@
 ---
+trailblazing_turtle::version: "%{alias('trailblazing_turtle::install::version')}"
