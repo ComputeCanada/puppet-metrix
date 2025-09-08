@@ -50,6 +50,12 @@ class trailblazing_turtle::install (
     match             => '^kiwisolver',
     match_for_absence => true,
   }
+  -> file_line { 'matplotlib':
+    ensure            => absent,
+    path              => '/var/www/userportal/requirements.txt',
+    match             => '^matplotlib',
+    match_for_absence => true,
+  }
   -> file_line { 'numpy':
     ensure            => absent,
     path              => '/var/www/userportal/requirements.txt',
