@@ -88,7 +88,7 @@ class trailblazing_turtle::install (
   -> uv::venv { 'trailblazingturtle_venv':
     prefix            => '/opt/software/userportal-env',
     python            => $python_version,
-    requirements      => 'django-pam',
+    requirements      => 'django-auth-ldap',
     requirements_path => '/var/www/userportal/requirements.txt',
     require           => [
       Package['gcc'],

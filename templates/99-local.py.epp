@@ -15,7 +15,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'django_pam',
     'csp',
     'watchman',
 
@@ -33,6 +32,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'bootstrap_pagination',
 ]
+
+AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
+AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
+AUTH_LDAP_BIND_PASSWORD = '<%= $ldap_password %>'
+AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,cn=users,cn=accounts,<%= $base_dn %>"
 
 DATABASES = {
     'default': {
@@ -53,9 +57,9 @@ DATABASES = {
     },
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
-        'NAME': 'ldaps://ipa.int.<%= $domain_name %>/',
-        'USER': 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
-        'PASSWORD': '<%= $ldap_password %>',
+        'NAME': AUTH_LDAP_SERVER_URI
+        'USER': AUTH_LDAP_BIND_DN,
+        'PASSWORD': AUTH_LDAP_BIND_PASSWORD,
     },
 }
 
@@ -78,7 +82,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/userportal-static/'
 
 AUTHENTICATION_BACKENDS = [
-    'django_pam.auth.backends.PAMBackend',
+    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
