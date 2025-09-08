@@ -20,13 +20,87 @@ class metrix::install (
     cleanup         => true,
     user            => 'apache',
   }
-  # Relax cffi constraint to allow downloading a wheel
-  -> file_line { 'cffi':
-    path  => '/var/www/metrix/requirements.txt',
-    match => '^cffi',
-    line  => 'cffi~=1.16',
+  # We use LDAP auth instead of SAML2 auth, so we can remove all
+  # code and dependencies related to SAML2
+  -> file_line { 'remove_saml2_urls':
+    ensure            => absent,
+    path              => '/var/www/metrix/userportal/urls.py',
+    match             => 'saml2',
+    match_for_absence => true,
+    multiple          => true,
   }
-  # Next dependencies are not use by Trailblazing Turtle
+  -> file_line { 'remove_saml2_10-base':
+    ensure            => absent,
+    path              => '/var/www/metrix/userportal/settings/10-base.py',
+    match             => 'saml2',
+    match_for_absence => true,
+    multiple          => true,
+  }
+  -> file { 'remove_40-saml':
+    ensure            => absent,
+    path              => '/var/www/metrix/userportal/settings/40-saml.py',
+  }
+  -> file_line { 'cffi':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^cffi',
+    match_for_absence => true,
+  }
+  -> file_line { 'cryptography':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^cryptography',
+    match_for_absence => true,
+  }
+  -> file_line { 'defusedxml':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^defusedxml',
+    match_for_absence => true,
+  }
+  -> file_line { 'djangosaml2':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^djangosaml2',
+    match_for_absence => true,
+  }
+  -> file_line { 'elementpath':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^elementpath',
+    match_for_absence => true,
+  }
+  -> file_line { 'pycparser':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^pycparser',
+    match_for_absence => true,
+  }
+  -> file_line { 'pyparsing':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^pyparsing',
+    match_for_absence => true,
+  }
+  -> file_line { 'pysaml2':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^pysaml2',
+    match_for_absence => true,
+  }
+  -> file_line { 'pyOpenSSL':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^pyOpenSSL',
+    match_for_absence => true,
+  }
+  -> file_line { 'xmlschema':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^xmlschema',
+    match_for_absence => true,
+  }
+  # Next dependencies are not used by Trailblazing Turtle
   # they are dependencies of matplotlib which should be optional
   # dependencies of prometheus-api-client, but currently aren't
   # so we remove the dependencies and install a fork of prometheus-api-client
@@ -36,6 +110,12 @@ class metrix::install (
     ensure            => absent,
     path              => '/var/www/metrix/requirements.txt',
     match             => '^contourpy',
+    match_for_absence => true,
+  }
+  -> file_line { 'cycler':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^cycler',
     match_for_absence => true,
   }
   -> file_line { 'fonttools':
@@ -56,6 +136,20 @@ class metrix::install (
     match             => '^matplotlib',
     match_for_absence => true,
   }
+  -> file_line { 'pillow':
+    ensure            => absent,
+    path              => '/var/www/metrix/requirements.txt',
+    match             => '^pillow',
+    match_for_absence => true,
+  }
+  -> file_line { 'prometheus-api-client':
+    path  => '/var/www/metrix/requirements.txt',
+    match => '^prometheus-api-client',
+    line  => 'prometheus-api-client-optional-matplotlib~=0.6.0',
+  }
+  # Numpy and pandas are hard dependencies of prometheus-api-client
+  # but we leave prometheus-api-client the luxury of defining the
+  # actual version requirements.
   -> file_line { 'numpy':
     ensure            => absent,
     path              => '/var/www/metrix/requirements.txt',
@@ -67,17 +161,6 @@ class metrix::install (
     path              => '/var/www/metrix/requirements.txt',
     match             => '^pandas',
     match_for_absence => true,
-  }
-  -> file_line { 'pillow':
-    ensure            => absent,
-    path              => '/var/www/metrix/requirements.txt',
-    match             => '^pillow',
-    match_for_absence => true,
-  }
-  -> file_line { 'prometheus-api-client':
-    path  => '/var/www/metrix/requirements.txt',
-    match => '^prometheus-api-client',
-    line  => 'prometheus-api-client-optional-matplotlib~=0.6.0',
   }
   # Relax regex package constraints to allow downloading a wheel install of compiling
   -> file_line { 'regex':
