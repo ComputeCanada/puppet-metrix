@@ -1,4 +1,4 @@
-class trailblazing_turtle (
+class metrix (
   String $version,
   String $root_api_token,
   String $password,
@@ -14,11 +14,11 @@ class trailblazing_turtle (
   String $cluster_name,
   String $subdomain,
 ) {
-  include trailblazing_turtle::install
+  include metrix::install
 
-  file { '/var/www/userportal/userportal/settings/99-local.py':
+  file { '/var/www/metrix/userportal/settings/99-local.py':
     show_diff => false,
-    content   => epp('trailblazing_turtle/99-local.py',
+    content   => epp('metrix/99-local.py',
       {
         'version'         => $version,
         'password'        => $password,
@@ -39,80 +39,80 @@ class trailblazing_turtle (
     owner     => 'apache',
     group     => 'apache',
     mode      => '0600',
-    require   => Class['trailblazing_turtle::install'],
+    require   => Class['metrix::install'],
   }
 
-  file { '/var/www/userportal/userportal/local.py':
-    source  => 'file:/var/www/userportal/example/local.py',
-    require => Class['trailblazing_turtle::install'],
-    notify  => Service['gunicorn-userportal'],
+  file { '/var/www/metrix/userportal/local.py':
+    source  => 'file:/var/www/metrix/example/local.py',
+    require => Class['metrix::install'],
+    notify  => Service['metrix'],
   }
 
-  file { '/var/www/userportal-static':
+  file { '/var/www/metrix-static':
     ensure => 'directory',
     owner  => 'apache',
     group  => 'apache',
   }
 
-  file { '/etc/httpd/conf.d/userportal.conf':
-    content => epp('trailblazing_turtle/userportal.conf.epp'),
+  file { '/etc/httpd/conf.d/metrix.conf':
+    content => epp('metrix/metrix.conf.epp'),
     seltype => 'httpd_config_t',
   }
 
-  file { '/etc/systemd/system/gunicorn-userportal.service':
+  file { '/etc/systemd/system/metrix.service':
     mode   => '0644',
-    source => 'puppet:///modules/trailblazing_turtle/gunicorn-userportal.service',
-    notify => Service['gunicorn-userportal'],
+    source => 'puppet:///modules/metrix/metrix.service',
+    notify => Service['metrix'],
   }
 
-  service { 'gunicorn-userportal':
+  service { 'metrix':
     ensure  => 'running',
     enable  => true,
-    require => Class['trailblazing_turtle::install'],
+    require => Class['metrix::install'],
   }
 
-  exec { 'userportal_migrate':
+  exec { 'metrix_migrate':
     command     => 'manage.py migrate',
     path        => [
-      '/var/www/userportal',
-      '/opt/software/userportal-env/bin',
+      '/var/www/metrix',
+      '/opt/software/metrix-env/bin',
     ],
     refreshonly => true,
     subscribe   => [
-      Mysql::Db['userportal'],
-      Class['trailblazing_turtle::install'],
-      File['/var/www/userportal/userportal/settings/99-local.py'],
-      File['/var/www/userportal/userportal/local.py'],
+      Mysql::Db['metrix'],
+      Class['metrix::install'],
+      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/local.py'],
     ],
-    notify      => Service['gunicorn-userportal'],
+    notify      => Service['metrix'],
   }
 
-  exec { 'userportal_collectstatic':
+  exec { 'metrix_collectstatic':
     command => 'manage.py collectstatic --noinput',
     path    => [
-      '/var/www/userportal',
-      '/opt/software/userportal-env/bin',
+      '/var/www/metrix',
+      '/opt/software/metrix-env/bin',
     ],
     require => [
-      File['/var/www/userportal/userportal/settings/99-local.py'],
-      File['/var/www/userportal/userportal/local.py'],
-      Class['trailblazing_turtle::install'],
+      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/local.py'],
+      Class['metrix::install'],
     ],
     creates => [
-      '/var/www/userportal-static/admin',
-      '/var/www/userportal-static/custom.js',
-      '/var/www/userportal-static/dashboard.css',
+      '/var/www/metrix-static/admin',
+      '/var/www/metrix-static/custom.js',
+      '/var/www/metrix-static/dashboard.css',
     ],
   }
 
-  exec { 'userportal_apiuser':
+  exec { 'metrix_apiuser':
     command     => "manage.py createsuperuser --noinput --username root --email root@${domain_name}",
     path        => [
-      '/var/www/userportal',
-      '/opt/software/userportal-env/bin',
+      '/var/www/metrix',
+      '/opt/software/metrix-env/bin',
     ],
     refreshonly => true,
-    subscribe   => Exec['userportal_migrate'],
+    subscribe   => Exec['metrix_migrate'],
     returns     => [0, 1], # ignore error if user already exists
   }
 
@@ -126,30 +126,30 @@ class trailblazing_turtle (
     Token.objects.filter(user_id=1).update(key="${root_api_token}")' | manage.py shell
     |EOT
 
-  file { '/var/www/userportal/.root_api_token.hash':
+  file { '/var/www/metrix/.root_api_token.hash':
     content => sha256($root_api_token),
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
   }
 
-  exec { 'userportal_api_token':
+  exec { 'metrix_api_token':
     command     => Sensitive($api_token_command),
     subscribe   => [
-      Exec['userportal_apiuser'],
-      File['/var/www/userportal/.root_api_token.hash'],
+      Exec['metrix_apiuser'],
+      File['/var/www/metrix/.root_api_token.hash'],
     ],
     refreshonly => true,
     path        => [
-      '/var/www/userportal',
-      '/opt/software/userportal-env/bin',
+      '/var/www/metrix',
+      '/opt/software/metrix-env/bin',
       '/usr/bin',
     ],
   }
 
-  mysql::db { 'userportal':
+  mysql::db { 'metrix':
     ensure   => present,
-    user     => 'userportal',
+    user     => 'metrix',
     password => $password,
     host     => 'localhost',
     grant    => ['ALL'],

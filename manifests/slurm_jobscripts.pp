@@ -1,4 +1,4 @@
-class trailblazing_turtle::slurm_jobscripts (
+class metrix::slurm_jobscripts (
   String $api_url,
   String $token
 ) {
@@ -24,11 +24,11 @@ class trailblazing_turtle::slurm_jobscripts (
 
   file { '/etc/systemd/system/slurm_jobscripts.service':
     mode   => '0644',
-    source => 'puppet:///modules/trailblazing_turtle/slurm_jobscripts.service',
+    source => 'puppet:///modules/metrix/slurm_jobscripts.service',
     notify => Service['slurm_jobscripts'],
   }
 
-  $portal_version = lookup('trailblazing_turtle::version')
+  $portal_version = lookup('metrix::version')
   file { '/opt/software/slurm/bin/slurm_jobscripts.py':
     mode    => '0755',
     source  => "https://raw.githubusercontent.com/guilbaults/TrailblazingTurtle/v${portal_version}/slurm_jobscripts/slurm_jobscripts.py",

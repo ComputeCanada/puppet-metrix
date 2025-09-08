@@ -1,2 +1,2 @@
 ---
-trailblazing_turtle::version: "%{alias('trailblazing_turtle::install::version')}"
+metrix::version: "%{alias('metrix::install::version')}"

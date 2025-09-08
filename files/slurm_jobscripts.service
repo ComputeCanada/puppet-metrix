@@ -1,5 +1,5 @@
 [Unit]
-Description=Send slurm jobscripts to userportal
+Description=Send slurm jobscripts to metrix
 After=network.target
 
 [Service]

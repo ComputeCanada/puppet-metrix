@@ -1,13 +1,13 @@
 Listen 9000
 
 <VirtualHost *:9000>
-  DocumentRoot "/var/www/userportal"
+  DocumentRoot "/var/www/metrix"
 
   ProxyPass /static/ !
   ProxyPass / http://127.0.0.1:8001/
-  Alias /static "/var/www/userportal-static"
+  Alias /static "/var/www/metrix-static"
 
-  <Directory "/var/www/userportal-static">
+  <Directory "/var/www/metrix-static">
     Order allow,deny
     Allow from all
     Options Indexes FollowSymLinks MultiViews

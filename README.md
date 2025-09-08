@@ -1,6 +1,6 @@
-# puppet-trailblazing_turtle
+# puppet-metrix
 
-Puppet module to install, configure, and manage Trailblazing Turtle user portal.
+Puppet module to install, configure, and manage Trailblazing Turtle user portal under the service name "metrix"
 
 For more info about Trailblazing Turtle refer to [guilbaults/TrailblazingTurtle](https://github.com/guilbaults/trailblazingturtle)
 
