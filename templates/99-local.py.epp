@@ -57,7 +57,7 @@ DATABASES = {
     },
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
-        'NAME': AUTH_LDAP_SERVER_URI
+        'NAME': AUTH_LDAP_SERVER_URI,
         'USER': AUTH_LDAP_BIND_DN,
         'PASSWORD': AUTH_LDAP_BIND_PASSWORD,
     },
