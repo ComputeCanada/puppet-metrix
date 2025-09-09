@@ -7,31 +7,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS = ['https://<%= $subdomain %>.<%= $domain_name %>']
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.humanize',
-    'csp',
-    'watchman',
-
-    'pages',
-    'slurm',
-    'notes',
-
-    'jobstats',
-    'top',
-
-    'ccldap',
-
-    # system modules
-    'rest_framework',
-    'rest_framework.authtoken',
-    'bootstrap_pagination',
-]
+INSTALLED_APPS.remove('djangosaml2')
 
 AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
 AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
