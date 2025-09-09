@@ -38,6 +38,9 @@ AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
 AUTH_LDAP_BIND_PASSWORD = '<%= $ldap_password %>'
 AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,cn=users,cn=accounts,<%= $base_dn %>"
 
+LDAP_BASE_DN = '<%= $base_dn %>'
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -128,5 +131,3 @@ FAVICON = 'https://raw.githubusercontent.com/computecanada/magic_castle/assets/l
 CLUSTER_INTRO = """
 <p><%= $cluster_name %>'s cluster</p>
 """
-
-BASE_DN = '<%= $base_dn %>'
