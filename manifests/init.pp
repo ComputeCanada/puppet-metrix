@@ -1,5 +1,4 @@
 class metrix (
-  String $version,
   String $root_api_token,
   String $password,
   String $prometheus_ip,
@@ -20,7 +19,6 @@ class metrix (
     show_diff => false,
     content   => epp('metrix/99-local.py',
       {
-        'version'         => $version,
         'password'        => $password,
         'slurm_password'  => $slurm_password,
         'cluster_name'    => $cluster_name,
