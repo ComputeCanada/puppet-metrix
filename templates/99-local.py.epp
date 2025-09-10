@@ -7,8 +7,6 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS = ['https://<%= $subdomain %>.<%= $domain_name %>']
 
-INSTALLED_APPS.remove('djangosaml2')
-
 AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
 AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
 AUTH_LDAP_BIND_PASSWORD = '<%= $ldap_password %>'
