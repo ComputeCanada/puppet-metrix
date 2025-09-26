@@ -1,5 +1,4 @@
 class metrix (
-  String $root_api_token,
   String $password,
   String $prometheus_ip,
   Integer $prometheus_port,
@@ -12,6 +11,7 @@ class metrix (
   String $slurm_password,
   String $cluster_name,
   String $subdomain,
+  Optional[String] $root_api_token = undef,
 ) {
   include metrix::install
 
@@ -103,46 +103,48 @@ class metrix (
     ],
   }
 
-  exec { 'metrix_apiuser':
-    command     => "manage.py createsuperuser --noinput --username root --email root@${domain_name}",
-    path        => [
-      '/var/www/metrix',
-      '/opt/software/metrix-env/bin',
-    ],
-    refreshonly => true,
-    subscribe   => Exec['metrix_migrate'],
-    returns     => [0, 1], # ignore error if user already exists
-  }
+  if $root_api_token {
+    exec { 'metrix_apiuser':
+      command     => "manage.py createsuperuser --noinput --username root --email root@${domain_name}",
+      path        => [
+        '/var/www/metrix',
+        '/opt/software/metrix-env/bin',
+      ],
+      refreshonly => true,
+      subscribe   => Exec['metrix_migrate'],
+      returns     => [0, 1], # ignore error if user already exists
+    }
 
-  $api_token_command = @("EOT")
-    echo 'from django.db.utils import IntegrityError
-    from rest_framework.authtoken.models import Token
-    try:
-      Token.objects.create(user_id=1)
-    except IntegrityError:
-      pass
-    Token.objects.filter(user_id=1).update(key="${root_api_token}")' | manage.py shell
-    |EOT
+    $api_token_command = @("EOT")
+      echo 'from django.db.utils import IntegrityError
+      from rest_framework.authtoken.models import Token
+      try:
+        Token.objects.create(user_id=1)
+      except IntegrityError:
+        pass
+      Token.objects.filter(user_id=1).update(key="${root_api_token}")' | manage.py shell
+      |EOT
 
-  file { '/var/www/metrix/.root_api_token.hash':
-    content => sha256($root_api_token),
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0600',
-  }
+    file { '/var/www/metrix/.root_api_token.hash':
+      content => sha256($root_api_token),
+      owner   => 'root',
+      group   => 'root',
+      mode    => '0600',
+    }
 
-  exec { 'metrix_api_token':
-    command     => Sensitive($api_token_command),
-    subscribe   => [
-      Exec['metrix_apiuser'],
-      File['/var/www/metrix/.root_api_token.hash'],
-    ],
-    refreshonly => true,
-    path        => [
-      '/var/www/metrix',
-      '/opt/software/metrix-env/bin',
-      '/usr/bin',
-    ],
+    exec { 'metrix_api_token':
+      command     => Sensitive($api_token_command),
+      subscribe   => [
+        Exec['metrix_apiuser'],
+        File['/var/www/metrix/.root_api_token.hash'],
+      ],
+      refreshonly => true,
+      path        => [
+        '/var/www/metrix',
+        '/opt/software/metrix-env/bin',
+        '/usr/bin',
+      ],
+    }
   }
 
   mysql::db { 'metrix':
