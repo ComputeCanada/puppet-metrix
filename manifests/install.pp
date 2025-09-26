@@ -1,4 +1,5 @@
 class metrix::install (
+  String $source = 'https://github.com/guilbaults/TrailblazingTurtle',
   String $version = '1.6.0',
   String $python_version = '3.13',
 ) {
@@ -11,7 +12,7 @@ class metrix::install (
   }
   -> archive { 'metrix':
     ensure          => present,
-    source          => "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
+    source          => "${source}/archive/refs/tags/v${version}.tar.gz",
     creates         => '/var/www/metrix/manage.py',
     path            => '/tmp/metrix.tar.gz',
     extract         => true,
