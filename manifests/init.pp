@@ -13,8 +13,14 @@ class metrix (
   String $cluster_name,
   String $subdomain,
   String $slurm_user = 'slurm',
+  String $ssl_private_key_file = '/etc/ssl/metrix.private.key',
+  String $ssl_public_cert_file = '/etc/ssl/metrix.public.cert',
+  Enum['ldap', 'saml2'] $auth_type = 'ldap',
   Optional[String] $slurm_db_ip = undef,
   Optional[Integer] $slurm_db_port = undef,
+  Optional[String] $ssl_private_key = undef,
+  Optional[String] $ssl_public_cert = undef,
+  Optional[String] $idp_metadata = undef,
 ) {
   include metrix::install
 
@@ -38,6 +44,9 @@ class metrix (
         'slurm_db_port'   => pick($slurm_db_port, $db_port),
         'base_dn'         => $base_dn,
         'ldap_password'   => $ldap_password,
+        'auth_type'       => $auth_type,
+        'ssl_key_file'    => $ssl_private_key_file,
+        'ssl_cert_file'   => $ssl_public_cert_file,
       }
     ),
     owner     => 'apache',
@@ -135,6 +144,31 @@ class metrix (
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
+  }
+
+  if $ssl_private_key != undef {
+    file { $ssl_private_key_file:
+      content => $ssl_private_key,
+      mode    => '0400',
+      owner   => 'apache',
+      group   => 'apache',
+    }
+  }
+  if $ssl_public_cert != undef {
+    file { $ssl_public_cert_file:
+      content => $ssl_public_cert,
+      mode    => '0422',
+      owner   => 'apache',
+      group   => 'apache',
+    }
+  }
+  if $idp_metadata != undef {
+    file { '/var/www/metrix/idp_metadata.xml':
+      content => $idp_metadata,
+      mode   => '0422',
+      owner  => 'apache',
+      group  => 'apache',
+    }
   }
 
   exec { 'metrix_api_token':
