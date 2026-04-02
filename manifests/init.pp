@@ -12,6 +12,9 @@ class metrix (
   String $slurm_password,
   String $cluster_name,
   String $subdomain,
+  String $slurm_user = 'slurm',
+  Optional[String] $slurm_db_ip = undef,
+  Optional[Integer] $slurm_db_port = undef,
 ) {
   include metrix::install
 
@@ -20,6 +23,7 @@ class metrix (
     content   => epp('metrix/99-local.py',
       {
         'password'        => $password,
+        'slurm_user'      => $slurm_user,
         'slurm_password'  => $slurm_password,
         'cluster_name'    => $cluster_name,
         'secret_key'      => stdlib::seeded_rand_string(32, $password),
@@ -30,6 +34,8 @@ class metrix (
         'prometheus_port' => $prometheus_port,
         'db_ip'           => $db_ip,
         'db_port'         => $db_port,
+        'slurm_db_ip'     => pick($slurm_db_ip, $db_ip),
+        'slurm_db_port'   => pick($slurm_db_port, $db_port),
         'base_dn'         => $base_dn,
         'ldap_password'   => $ldap_password,
       }
