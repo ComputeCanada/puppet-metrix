@@ -12,12 +12,15 @@ class metrix (
   String $slurm_password,
   String $cluster_name,
   String $subdomain,
+  String $slurm_user = 'slurm',
   String $ssl_private_key_file = '/etc/ssl/metrix.private.key',
   String $ssl_public_cert_file = '/etc/ssl/metrix.public.cert',
   Enum['ldap', 'saml2'] $auth_type = 'ldap',
   Optional[String] $ssl_private_key = undef,
   Optional[String] $ssl_public_cert = undef,
   Optional[String] $idp_metadata = undef,
+  Optional[String] $slurm_db_ip = undef,
+  Optional[Integer] $slurm_db_port = undef,
 ) {
   include metrix::install
 
@@ -26,6 +29,7 @@ class metrix (
     content   => epp('metrix/99-local.py',
       {
         'password'        => $password,
+        'slurm_user'      => $slurm_user,
         'slurm_password'  => $slurm_password,
         'cluster_name'    => $cluster_name,
         'secret_key'      => seeded_rand_string(32, $password),
@@ -36,6 +40,8 @@ class metrix (
         'prometheus_port' => $prometheus_port,
         'db_ip'           => $db_ip,
         'db_port'         => $db_port,
+        'slurm_db_ip'     => $slurm_db_ip != undef ? { true => $slurm_db_ip, false =>$db_ip },
+        'slurm_db_port'   => $slurm_db_port != undef ? { true => $slurm_db_port, false => $db_port },
         'base_dn'         => $base_dn,
         'ldap_password'   => $ldap_password,
         'auth_type'       => $auth_type,

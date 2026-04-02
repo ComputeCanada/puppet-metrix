@@ -28,10 +28,10 @@ DATABASES = {
     'slurm': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'slurm_acct_db',
-        'USER': 'slurm',
+        'USER': '<%= $slurm_user %>',
         'PASSWORD': '<%= $slurm_password %>',
-        'HOST': '<%= $db_ip %>',
-        'PORT': '<%= $db_port %>',
+        'HOST': '<%= $slurm_db_ip %>',
+        'PORT': '<%= $slurm_db_port %>',
     },
 <% if $auth_type == 'ldap' { %>
     'ldap': {
