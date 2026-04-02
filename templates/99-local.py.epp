@@ -7,13 +7,14 @@ DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 CSRF_TRUSTED_ORIGINS = ['https://<%= $subdomain %>.<%= $domain_name %>']
 
+<% if $auth_type == 'ldap' { %>
 AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
 AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
 AUTH_LDAP_BIND_PASSWORD = '<%= $ldap_password %>'
 AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,cn=users,cn=accounts,<%= $base_dn %>"
 
 LDAP_BASE_DN = '<%= $base_dn %>'
-
+<% } %>
 
 DATABASES = {
     'default': {
@@ -32,16 +33,15 @@ DATABASES = {
         'HOST': '<%= $db_ip %>',
         'PORT': '<%= $db_port %>',
     },
+<% if $auth_type == 'ldap' { %>
     'ldap': {
         'ENGINE': 'ldapdb.backends.ldap',
         'NAME': AUTH_LDAP_SERVER_URI,
         'USER': AUTH_LDAP_BIND_DN,
         'PASSWORD': AUTH_LDAP_BIND_PASSWORD,
     },
+<% } %>
 }
-
-import ldap
-ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
 
 PROMETHEUS = {
     'url': 'http://<%= $prometheus_ip %>:<%= $prometheus_port %>',
@@ -55,11 +55,28 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/metrix-static/'
 
 AUTHENTICATION_BACKENDS = [
-    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+<% if $auth_type == 'ldap' { %>
+
+import ldap
+ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
+AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
 LOGIN_URL = '/accounts/login/' # So it does not use SAML2
+
+<% } elsif $auth_type == 'saml2' { %>
+
+AUTHENTICATION_BACKENDS += ['userportal.authentication.staffSaml2Backend']
+SAML_CONFIG['service']['sp']['endpoints']['assertion_consumer_service'] = ('https://metrix.<%= $domain_name %>/saml2/acs/', saml2.BINDING_HTTP_POST)
+SAML_CONFIG['entityid'] = 'https://metrix.<%= $domain_name %>/saml2/metadata/'
+SAML_CONFIG['key_file'] = '<%= $ssl_key_file %>'
+SAML_CONFIG['cert_file'] = '<%= $ssl_cert_file %>'
+SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '<%= $ssl_key_file %>'
+SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '<%= $ssl_cert_file %>'
+SAML_CONFIG['metadata']['local'][0] = '/var/www/metrix/idp_metadata.xml'
+<% } %>
+
 
 EXPORTER_INSTALLED = [
     'slurm-job-exporter',
