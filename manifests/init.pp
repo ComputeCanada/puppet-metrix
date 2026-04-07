@@ -12,14 +12,20 @@ class metrix (
   String $slurm_password,
   String $cluster_name,
   String $subdomain,
-  String $ssl_private_key_file = '/etc/ssl/metrix.private.key',
-  String $ssl_public_cert_file = '/etc/ssl/metrix.public.cert',
   Enum['ldap', 'saml2'] $auth_type = 'ldap',
-  Optional[String] $ssl_private_key = undef,
-  Optional[String] $ssl_public_cert = undef,
-  Optional[String] $idp_metadata = undef,
 ) {
   include metrix::install
+  case $auth_type {
+    'ldap': {
+      include metrix::auth::ldap
+    }
+    'saml2': {
+      include metrix::auth::saml2
+    }
+    default: {
+      fail('Unsupported auth_type')
+    }
+  }
 
   file { '/var/www/metrix/userportal/settings/99-local.py':
     show_diff => false,
@@ -39,8 +45,6 @@ class metrix (
         'base_dn'         => $base_dn,
         'ldap_password'   => $ldap_password,
         'auth_type'       => $auth_type,
-        'ssl_key_file'    => $ssl_private_key_file,
-        'ssl_cert_file'   => $ssl_public_cert_file,
       }
     ),
     owner     => 'apache',
@@ -138,31 +142,6 @@ class metrix (
     owner   => 'root',
     group   => 'root',
     mode    => '0600',
-  }
-
-  if $ssl_private_key != undef {
-    file { $ssl_private_key_file:
-      content => $ssl_private_key,
-      mode    => '0400',
-      owner   => 'apache',
-      group   => 'apache',
-    }
-  }
-  if $ssl_public_cert != undef {
-    file { $ssl_public_cert_file:
-      content => $ssl_public_cert,
-      mode    => '0422',
-      owner   => 'apache',
-      group   => 'apache',
-    }
-  }
-  if $idp_metadata != undef {
-    file { '/var/www/metrix/idp_metadata.xml':
-      content => $idp_metadata,
-      mode   => '0422',
-      owner  => 'apache',
-      group  => 'apache',
-    }
   }
 
   exec { 'metrix_api_token':

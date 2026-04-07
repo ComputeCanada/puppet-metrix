@@ -1,22 +1,19 @@
 class metrix::install (
+  String $source_url = 'https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz',
   String $version = '1.6.0',
   String $python_version = '3.13',
 ) {
-  $auth_type = lookup('metrix::auth_type')
-
-  if $auth_type == 'saml2' {
-    ensure_packages(['libffi-devel', 'xmlsec1', 'xmlsec1-openssl'])
-  }
-  ensure_packages(['gcc', 'openldap-devel'])
+  ensure_packages(['gcc', 'openldap-devel', 'httpd'])
 
   file { '/var/www/metrix/':
-    ensure => 'directory',
-    owner  => 'apache',
-    group  => 'apache',
+    ensure  => 'directory',
+    owner   => 'apache',
+    group   => 'apache',
+    require => Package['httpd'],
   }
   -> archive { 'metrix':
     ensure          => present,
-    source          => "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
+    source          => inline_template($source_url),
     creates         => '/var/www/metrix/manage.py',
     path            => '/tmp/metrix.tar.gz',
     extract         => true,
@@ -25,100 +22,7 @@ class metrix::install (
     cleanup         => true,
     user            => 'apache',
   }
-  if $auth_type == 'ldap' {
-    # We use LDAP auth instead of SAML2 auth, so we can remove all
-    # code and dependencies related to SAML2
-    file_line { 'remove_saml2_urls':
-      ensure            => absent,
-      path              => '/var/www/metrix/userportal/urls.py',
-      match             => 'saml2',
-      match_for_absence => true,
-      multiple          => true,
-      require           => Archive['metrix']
-    }
-    -> file_line { 'remove_saml2_10-base':
-      ensure            => absent,
-      path              => '/var/www/metrix/userportal/settings/10-base.py',
-      match             => 'saml2',
-      match_for_absence => true,
-      multiple          => true,
-    }
-    -> file { 'remove_40-saml':
-      ensure            => absent,
-      path              => '/var/www/metrix/userportal/settings/40-saml.py',
-    }
-    -> file_line { 'cffi':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^cffi',
-      match_for_absence => true,
-    }
-    -> file_line { 'cryptography':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^cryptography',
-      match_for_absence => true,
-    }
-    -> file_line { 'defusedxml':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^defusedxml',
-      match_for_absence => true,
-    }
-    -> file_line { 'djangosaml2':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^djangosaml2',
-      match_for_absence => true,
-    }
-    -> file_line { 'elementpath':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^elementpath',
-      match_for_absence => true,
-    }
-    -> file_line { 'pycparser':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^pycparser',
-      match_for_absence => true,
-    }
-    -> file_line { 'pyparsing':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^pyparsing',
-      match_for_absence => true,
-    }
-    -> file_line { 'pysaml2':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^pysaml2',
-      match_for_absence => true,
-    }
-    -> file_line { 'pyOpenSSL':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^pyOpenSSL',
-      match_for_absence => true,
-    }
-    -> file_line { 'xmlschema':
-      ensure            => absent,
-      path              => '/var/www/metrix/requirements.txt',
-      match             => '^xmlschema',
-      match_for_absence => true,
-    }
-  }
-  else {
-    # fixes version of cffi https://github.com/authlib/authlib/issues/681
-    file_line { 'cffi':
-      ensure => present,
-      path   => '/var/www/metrix/requirements.txt',
-      match  => '^cffi',
-      line   => 'cffi==1.17.1',
-      require => Archive['metrix'],
-      before => Uv::Venv['metrix_venv'],
-    }
-  }
+
   # Next dependencies are not used by Trailblazing Turtle
   # they are dependencies of matplotlib which should be optional
   # dependencies of prometheus-api-client, but currently aren't
@@ -190,41 +94,25 @@ class metrix::install (
   }
   # Replace mysqlclient by a pure python compatible alternative to reduce install dependencies
   -> file_line { 'mysqlclient':
-    path  => '/var/www/metrix/requirements.txt',
-    match => '^mysqlclient',
-    line  => 'pymysql~=1.1',
+    path   => '/var/www/metrix/requirements.txt',
+    match  => '^mysqlclient',
+    line   => 'pymysql~=1.1',
     before => Uv::Venv['metrix_venv'],
   }
-  if $auth_type == 'ldap' {
-    uv::venv { 'metrix_venv':
-      prefix            => '/opt/software/metrix-env',
-      python            => $python_version,
-      requirements      => 'django-auth-ldap',
-      requirements_path => '/var/www/metrix/requirements.txt',
-      require           => [
-        Package['gcc'],
-        Package['openldap-devel'],
-      ],
-    }
+
+  uv::venv { 'metrix_venv':
+    prefix            => '/opt/software/metrix-env',
+    python            => $python_version,
+    requirements_path => '/var/www/metrix/requirements.txt',
   }
-  else {
-    uv::venv { 'metrix_venv':
-      prefix            => '/opt/software/metrix-env',
-      python            => $python_version,
-      requirements_path => '/var/www/metrix/requirements.txt',
-      require           => [
-        Package['gcc'],
-        Package['openldap-devel'],
-        Package['libffi-devel'],
-      ],
-    }
-  }
+  Package <| tag == 'metrix' |> -> Uv::Venv['metrix_venv']
+
   # Replace mysqlclient by pymysql in the Python code import.
   file_line { 'pymysql':
-    path  => '/var/www/metrix/manage.py',
-    after => '^import sys',
-    line  => 'import pymysql; pymysql.install_as_MySQLdb()',
-    require => Uv::Venv['metrix_venv']
+    path    => '/var/www/metrix/manage.py',
+    after   => '^import sys',
+    line    => 'import pymysql; pymysql.install_as_MySQLdb()',
+    require => Uv::Venv['metrix_venv'],
   }
   -> file_line { 'manage.py_header':
     path  => '/var/www/metrix/manage.py',
