@@ -66,10 +66,10 @@ LOGIN_URL = '/accounts/login/' # So it does not use SAML2
 AUTHENTICATION_BACKENDS += ['userportal.authentication.staffSaml2Backend']
 SAML_CONFIG['service']['sp']['endpoints']['assertion_consumer_service'] = ('https://<%= $subdomain %>.<%= $domain_name %>/saml2/acs/', saml2.BINDING_HTTP_POST)
 SAML_CONFIG['entityid'] = 'https://<%= $subdomain %>.<%= $domain_name %>/saml2/metadata/'
-SAML_CONFIG['key_file'] = '<%= $ssl_key_file %>'
-SAML_CONFIG['cert_file'] = '<%= $ssl_cert_file %>'
-SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '<%= $ssl_key_file %>'
-SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '<%= $ssl_cert_file %>'
+SAML_CONFIG['key_file'] = '/var/www/metrix/saml2-private.key'
+SAML_CONFIG['cert_file'] = '/var/www/metrix/saml2-public.pem'
+SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '/var/www/metrix/saml2-private.key'
+SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '/var/www/metrix/saml2-public.pem'
 SAML_CONFIG['metadata']['local'][0] = '/var/www/metrix/idp_metadata.xml'
 <% } %>
 
