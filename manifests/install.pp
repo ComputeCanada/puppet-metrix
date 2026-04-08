@@ -1,6 +1,6 @@
 class metrix::install (
   String $source_url = 'https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz',
-  String $version = '1.6.0',
+  String $version = '1.7.0',
   String $python_version = '3.13',
 ) {
   ensure_packages(['gcc', 'openldap-devel', 'httpd'])
@@ -22,7 +22,6 @@ class metrix::install (
     cleanup         => true,
     user            => 'apache',
   }
-
   # Next dependencies are not used by Trailblazing Turtle
   # they are dependencies of matplotlib which should be optional
   # dependencies of prometheus-api-client, but currently aren't

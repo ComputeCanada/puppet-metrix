@@ -26,14 +26,4 @@ class metrix::auth::saml2 (
     group   => 'apache',
     require => File['/var/www/metrix'],
   }
-
-  # fixes version of cffi https://github.com/authlib/authlib/issues/681
-  file_line { 'cffi':
-    ensure  => present,
-    path    => '/var/www/metrix/requirements.txt',
-    match   => '^cffi',
-    line    => 'cffi==1.17.1',
-    require => Archive['metrix'],
-    before  => Uv::Venv['metrix_venv'],
-  }
 }
