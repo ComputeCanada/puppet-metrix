@@ -1,5 +1,5 @@
 class metrix::install (
-  String $version = '1.6.0',
+  String $version = '1.7.0',
   String $python_version = '3.13',
 ) {
   $auth_type = lookup('metrix::auth_type')
@@ -106,17 +106,6 @@ class metrix::install (
       path              => '/var/www/metrix/requirements.txt',
       match             => '^xmlschema',
       match_for_absence => true,
-    }
-  }
-  else {
-    # fixes version of cffi https://github.com/authlib/authlib/issues/681
-    file_line { 'cffi':
-      ensure => present,
-      path   => '/var/www/metrix/requirements.txt',
-      match  => '^cffi',
-      line   => 'cffi==1.17.1',
-      require => Archive['metrix'],
-      before => Uv::Venv['metrix_venv'],
     }
   }
   # Next dependencies are not used by Trailblazing Turtle
