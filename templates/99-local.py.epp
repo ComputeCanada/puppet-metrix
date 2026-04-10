@@ -56,6 +56,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+REQUIRED_ACCESS_ATTRIBUTES = [
+<% $required_access_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
+STAFF_ATTRIBUTES = [
+<% $staff_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
 
 <% if $auth_type == 'ldap' { %>
 AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
@@ -76,21 +92,8 @@ SAML_CONFIG['service']['sp']['required_attributes'] += [
   '<%= $attribute %>',
 <% } -%>
 ]
-SAML_CONFIG['required_access_attributes'] = [
-<% $saml2_required_access_attributes.each |$pair| { -%>
-<% $pair.each |$attribute, $value| { -%>
-  ('<%= $attribute %>', '<%= $value %>'),
-<% } -%>
-<% } -%>
-]
-
-SAML_CONFIG['staff_attributes'] = [
-<% $saml2_staff_attributes.each |$pair| { -%>
-<% $pair.each |$attribute, $value| { -%>
-  ('<%= $attribute %>', '<%= $value %>'),
-<% } -%>
-<% } -%>
-]
+SAML_CONFIG['required_access_attributes'] = REQUIRED_ACCESS_ATTRIBUTES
+SAML_CONFIG['staff_attributes'] = STAFF_ATTRIBUTES
 
 <% } %>
 
