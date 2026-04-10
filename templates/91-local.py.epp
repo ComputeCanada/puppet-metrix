@@ -4,8 +4,10 @@ pymysql.install_as_MySQLdb()
 SECRET_KEY = '<%= $secret_key %>'
 DEBUG = False
 
+BASE_URL = 'https://<%= $subdomain %>.<%= $domain_name %>'
+
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = ['https://<%= $subdomain %>.<%= $domain_name %>']
+CSRF_TRUSTED_ORIGINS = [BASE_URL]
 
 AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
 AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
@@ -55,24 +57,6 @@ STATIC_ROOT = '/var/www/metrix-static/'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-
-
-<% if $auth_type == 'ldap' { %>
-AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
-LOGIN_URL = '/accounts/login/' # So it does not use SAML2
-
-<% } elsif $auth_type == 'saml2' { %>
-
-AUTHENTICATION_BACKENDS += ['userportal.authentication.staffSaml2Backend']
-SAML_CONFIG['service']['sp']['endpoints']['assertion_consumer_service'] = ('https://<%= $subdomain %>.<%= $domain_name %>/saml2/acs/', saml2.BINDING_HTTP_POST)
-SAML_CONFIG['entityid'] = 'https://<%= $subdomain %>.<%= $domain_name %>/saml2/metadata/'
-SAML_CONFIG['key_file'] = '/var/www/metrix/saml2-private.key'
-SAML_CONFIG['cert_file'] = '/var/www/metrix/saml2-public.pem'
-SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '/var/www/metrix/saml2-private.key'
-SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '/var/www/metrix/saml2-public.pem'
-SAML_CONFIG['metadata']['local'][0] = '/var/www/metrix/idp_metadata.xml'
-<% } %>
-
 
 EXPORTER_INSTALLED = [
     'slurm-job-exporter',

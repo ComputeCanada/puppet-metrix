@@ -27,9 +27,9 @@ class metrix (
     }
   }
 
-  file { '/var/www/metrix/userportal/settings/99-local.py':
+  file { '/var/www/metrix/userportal/settings/91-local.py':
     show_diff => false,
-    content   => epp('metrix/99-local.py',
+    content   => epp('metrix/91-local.py',
       {
         'password'        => $password,
         'slurm_password'  => $slurm_password,
@@ -92,7 +92,7 @@ class metrix (
     subscribe   => [
       Mysql::Db['metrix'],
       Class['metrix::install'],
-      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/settings/91-local.py'],
       File['/var/www/metrix/userportal/local.py'],
     ],
     notify      => Service['metrix'],
@@ -105,7 +105,7 @@ class metrix (
       '/opt/software/metrix-env/bin',
     ],
     require => [
-      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/settings/91-local.py'],
       File['/var/www/metrix/userportal/local.py'],
       Class['metrix::install'],
     ],

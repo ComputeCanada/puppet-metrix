@@ -1,0 +1,28 @@
+AUTHENTICATION_BACKENDS += ['userportal.authentication.staffSaml2Backend']
+SAML_CONFIG['service']['sp']['endpoints']['assertion_consumer_service'] = (BASE_URL + '/saml2/acs/', saml2.BINDING_HTTP_POST)
+SAML_CONFIG['entityid'] = BASE_URL + '/saml2/metadata/'
+SAML_CONFIG['key_file'] = '/var/www/metrix/saml2-private.key'
+SAML_CONFIG['cert_file'] = '/var/www/metrix/saml2-public.pem'
+SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '/var/www/metrix/saml2-private.key'
+SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '/var/www/metrix/saml2-public.pem'
+SAML_CONFIG['metadata']['local'][0] = '/var/www/metrix/idp_metadata.xml'
+SAML_CONFIG['service']['sp']['required_attributes'] += [
+<% $extra_required_attributes.each |$attribute| { -%>
+  '<%= $attribute %>',
+<% } -%>
+]
+SAML_CONFIG['required_access_attributes'] = [
+<% $required_access_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
+SAML_CONFIG['staff_attributes'] = [
+<% $staff_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
