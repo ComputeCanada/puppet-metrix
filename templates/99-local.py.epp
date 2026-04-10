@@ -14,7 +14,6 @@ AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,cn=users,cn=accounts,<%= $base_dn %>"
 
 LDAP_BASE_DN = '<%= $base_dn %>'
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -42,7 +41,6 @@ DATABASES = {
 
 import ldap
 ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_ALLOW)
-
 PROMETHEUS = {
     'url': 'http://<%= $prometheus_ip %>:<%= $prometheus_port %>',
     'headers': {},
@@ -55,11 +53,50 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/metrix-static/'
 
 AUTHENTICATION_BACKENDS = [
-    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+REQUIRED_ACCESS_ATTRIBUTES = [
+<% $required_access_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
+STAFF_ATTRIBUTES = [
+<% $staff_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
+
+<% if $auth_type == 'ldap' { %>
+AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
 LOGIN_URL = '/accounts/login/' # So it does not use SAML2
+
+<% } elsif $auth_type == 'saml2' { %>
+
+AUTHENTICATION_BACKENDS += ['userportal.authentication.staffSaml2Backend']
+SAML_CONFIG['service']['sp']['endpoints']['assertion_consumer_service'] = ('https://<%= $subdomain %>.<%= $domain_name %>/saml2/acs/', saml2.BINDING_HTTP_POST)
+SAML_CONFIG['entityid'] = 'https://<%= $subdomain %>.<%= $domain_name %>/saml2/metadata/'
+SAML_CONFIG['key_file'] = '<%= $ssl_key_file %>'
+SAML_CONFIG['cert_file'] = '<%= $ssl_cert_file %>'
+SAML_CONFIG['encryption_keypairs'][0]['key_file'] = '<%= $ssl_key_file %>'
+SAML_CONFIG['encryption_keypairs'][0]['cert_file'] = '<%= $ssl_cert_file %>'
+SAML_CONFIG['metadata']['local'][0] = '/var/www/metrix/idp_metadata.xml'
+SAML_CONFIG['service']['sp']['required_attributes'] += [
+<% $saml2_extra_required_attributes.each |$attribute| { -%>
+  '<%= $attribute %>',
+<% } -%>
+]
+SAML_CONFIG['required_access_attributes'] = REQUIRED_ACCESS_ATTRIBUTES
+SAML_CONFIG['staff_attributes'] = STAFF_ATTRIBUTES
+
+<% } %>
+
 
 EXPORTER_INSTALLED = [
     'slurm-job-exporter',
