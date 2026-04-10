@@ -98,4 +98,16 @@ class metrix::auth::ldap {
     path   => '/var/www/metrix/requirements.txt',
     before => Uv::Venv['metrix_venv'],
   }
+
+  file { '/var/www/metrix/userportal/settings/92-local_ldap.py':
+    show_diff => false,
+    content   => epp('metrix/92-local_ldap.py',
+      {
+      }
+    ),
+    owner     => 'apache',
+    group     => 'apache',
+    mode      => '0600',
+    require   => Class['metrix::install'],
+  }
 }
