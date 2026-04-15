@@ -12,26 +12,42 @@ class metrix (
   String $slurm_password,
   String $cluster_name,
   String $subdomain,
+  Enum['ldap', 'saml2'] $auth_type = 'ldap',
+  Array[Hash[String, String]] $staff_attributes = [],
+  Array[Hash[String, String]] $required_access_attributes = [],
 ) {
   include metrix::install
+  case $auth_type {
+    'ldap': {
+      include metrix::auth::ldap
+    }
+    'saml2': {
+      include metrix::auth::saml2
+    }
+    default: {
+      fail('Unsupported auth_type')
+    }
+  }
 
-  file { '/var/www/metrix/userportal/settings/99-local.py':
+  file { '/var/www/metrix/userportal/settings/91-local.py':
     show_diff => false,
-    content   => epp('metrix/99-local.py',
+    content   => epp('metrix/91-local.py',
       {
-        'password'        => $password,
-        'slurm_password'  => $slurm_password,
-        'cluster_name'    => $cluster_name,
-        'secret_key'      => seeded_rand_string(32, $password),
-        'domain_name'     => $domain_name,
-        'subdomain'       => $subdomain,
-        'logins'          => $logins,
-        'prometheus_ip'   => $prometheus_ip,
-        'prometheus_port' => $prometheus_port,
-        'db_ip'           => $db_ip,
-        'db_port'         => $db_port,
-        'base_dn'         => $base_dn,
-        'ldap_password'   => $ldap_password,
+        'password'                   => $password,
+        'slurm_password'             => $slurm_password,
+        'cluster_name'               => $cluster_name,
+        'secret_key'                 => seeded_rand_string(32, $password),
+        'domain_name'                => $domain_name,
+        'subdomain'                  => $subdomain,
+        'logins'                     => $logins,
+        'prometheus_ip'              => $prometheus_ip,
+        'prometheus_port'            => $prometheus_port,
+        'db_ip'                      => $db_ip,
+        'db_port'                    => $db_port,
+        'base_dn'                    => $base_dn,
+        'ldap_password'              => $ldap_password,
+        'staff_attributes'           => $staff_attributes,
+        'required_access_attributes' => $required_access_attributes,
       }
     ),
     owner     => 'apache',
@@ -79,7 +95,7 @@ class metrix (
     subscribe   => [
       Mysql::Db['metrix'],
       Class['metrix::install'],
-      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/settings/91-local.py'],
       File['/var/www/metrix/userportal/local.py'],
     ],
     notify      => Service['metrix'],
@@ -92,7 +108,7 @@ class metrix (
       '/opt/software/metrix-env/bin',
     ],
     require => [
-      File['/var/www/metrix/userportal/settings/99-local.py'],
+      File['/var/www/metrix/userportal/settings/91-local.py'],
       File['/var/www/metrix/userportal/local.py'],
       Class['metrix::install'],
     ],
