@@ -46,7 +46,6 @@ class metrix (
         'db_port'                    => $db_port,
         'base_dn'                    => $base_dn,
         'ldap_password'              => $ldap_password,
-        'auth_type'                  => $auth_type,
         'staff_attributes'           => $staff_attributes,
         'required_access_attributes' => $required_access_attributes,
       }
