@@ -22,7 +22,7 @@ class metrix (
         'password'        => $password,
         'slurm_password'  => $slurm_password,
         'cluster_name'    => $cluster_name,
-        'secret_key'      => seeded_rand_string(32, $password),
+        'secret_key'      => stdlib::seeded_rand_string(32, $password),
         'domain_name'     => $domain_name,
         'subdomain'       => $subdomain,
         'logins'          => $logins,
