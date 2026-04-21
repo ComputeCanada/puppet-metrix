@@ -2,7 +2,7 @@ class metrix::slurm_jobscripts (
   String $api_url,
   String $token
 ) {
-  ensure_packages(['python3', 'python3-requests'])
+  stdlib::ensure_packages(['python3', 'python3-requests'])
   $slurm_jobscript_ini = @("EOT")
     [slurm]
     spool = /var/spool/slurm

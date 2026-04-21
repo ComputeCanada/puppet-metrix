@@ -2,7 +2,7 @@ class metrix::install (
   String $version = '1.6.0',
   String $python_version = '3.13',
 ) {
-  ensure_packages(['gcc', 'openldap-devel',])
+  stdlib::ensure_packages(['gcc', 'openldap-devel',])
 
   file { '/var/www/metrix/':
     ensure => 'directory',
