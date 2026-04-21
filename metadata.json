@@ -1,6 +1,6 @@
 {
     "name": "puppet-metrix",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "author": "Félix-Antoine Fortin, Simon Guilbault",
     "summary": "Install, configure, and manage Trailblazing Turtle user portal",
     "license": "MIT",
