@@ -30,13 +30,11 @@ class metrix::auth::saml2 (
     require => File['/var/www/metrix'],
   }
 
-  file { '/var/www/metrix/userportal/settings/92-local_saml2.py':
+  file { '/var/www/metrix/userportal/settings/92-local_auth.py':
     show_diff => false,
     content   => epp('metrix/92-local_saml2.py',
       {
         'extra_required_attributes'  => $extra_required_attributes,
-        'staff_attributes'           => $staff_attributes,
-        'required_access_attributes' => $required_access_attributes
       }
     ),
     owner     => 'apache',

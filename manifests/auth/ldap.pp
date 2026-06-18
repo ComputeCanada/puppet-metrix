@@ -99,7 +99,7 @@ class metrix::auth::ldap {
     before => Uv::Venv['metrix_venv'],
   }
 
-  file { '/var/www/metrix/userportal/settings/92-local_ldap.py':
+  file { '/var/www/metrix/userportal/settings/92-local_auth.py':
     show_diff => false,
     content   => epp('metrix/92-local_ldap.py',
       {

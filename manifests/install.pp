@@ -1,5 +1,5 @@
 class metrix::install (
-  String $source_url = 'https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz',
+  String $source_url = "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
   String $version = '1.7.0',
   String $python_version = '3.13',
 ) {
