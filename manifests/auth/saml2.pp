@@ -3,8 +3,6 @@ class metrix::auth::saml2 (
   String $ssl_public_cert,
   String $idp_metadata,
   Array[String] $extra_required_attributes = [],
-  Array[Hash[String, String]] $staff_attributes = [],
-  Array[Hash[String, String]] $required_access_attributes = [],
 ) {
   ensure_packages(['libffi-devel', 'xmlsec1', 'xmlsec1-openssl'])
 
