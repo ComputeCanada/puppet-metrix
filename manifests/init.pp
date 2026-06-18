@@ -42,6 +42,7 @@ class metrix (
     content   => epp('metrix/91-local.py',
       {
         'password'                   => $password,
+        'slurm_user'                 => $slurm_user,
         'slurm_password'             => $slurm_password,
         'cluster_name'               => $cluster_name,
         'secret_key'                 => seeded_rand_string(32, $password),
