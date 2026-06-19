@@ -13,16 +13,11 @@ class metrix (
   String $cluster_name,
   String $subdomain,
   String $slurm_user = 'slurm',
-  String $ssl_private_key_file = '/etc/ssl/metrix.private.key',
-  String $ssl_public_cert_file = '/etc/ssl/metrix.public.cert',
   Enum['ldap', 'saml2'] $auth_type = 'ldap',
   Array[Hash[String, String]] $staff_attributes = [],
   Array[Hash[String, String]] $required_access_attributes = [],
   Optional[String] $slurm_db_ip = undef,
   Optional[Integer] $slurm_db_port = undef,
-  Optional[String] $ssl_private_key = undef,
-  Optional[String] $ssl_public_cert = undef,
-  Optional[String] $idp_metadata = undef,
 ) {
   include metrix::install
   case $auth_type {
