@@ -7,7 +7,7 @@ DEBUG = False
 BASE_URL = 'https://<%= $subdomain %>.<%= $domain_name %>/'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = [BASE_URL]
+CSRF_TRUSTED_ORIGINS = [BASE_URL.strip('/')]
 
 AUTH_LDAP_SERVER_URI = 'ldaps://ipa.int.<%= $domain_name %>/'
 AUTH_LDAP_BIND_DN = 'uid=admin,cn=users,cn=accounts,<%= $base_dn %>',
