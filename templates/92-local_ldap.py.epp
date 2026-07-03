@@ -1,0 +1,2 @@
+AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
+LOGIN_URL = '/accounts/login/' # So it does not use SAML2
