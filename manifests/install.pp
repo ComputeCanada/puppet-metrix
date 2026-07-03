@@ -1,5 +1,6 @@
 class metrix::install (
-  String $version = '1.6.0',
+  String $source_url = "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
+  String $version = '1.8.0',
   String $python_version = '3.13',
 ) {
   stdlib::ensure_packages(['gcc', 'openldap-devel',])
@@ -11,7 +12,7 @@ class metrix::install (
   }
   -> archive { 'metrix':
     ensure          => present,
-    source          => "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
+    source          => inline_template($source_url),
     creates         => '/var/www/metrix/manage.py',
     path            => '/tmp/metrix.tar.gz',
     extract         => true,
