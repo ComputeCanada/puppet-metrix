@@ -58,6 +58,22 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+REQUIRED_ACCESS_ATTRIBUTES = [
+<% $required_access_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
+STAFF_ATTRIBUTES = [
+<% $staff_attributes.each |$pair| { -%>
+<% $pair.each |$attribute, $value| { -%>
+  ('<%= $attribute %>', '<%= $value %>'),
+<% } -%>
+<% } -%>
+]
+
 EXPORTER_INSTALLED = [
     'slurm-job-exporter',
     'node_exporter',
