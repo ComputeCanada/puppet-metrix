@@ -1,0 +1,39 @@
+JWT_OAUTH2_AUTH_ENABLED = True
+AUTHENTICATION_BACKENDS = ['userportal.authentication.staffOAuth2JWTBackend'] + AUTHENTICATION_BACKENDS
+
+LOGIN_URL = '/oauth2/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# OAuth2JWT provider configurations:
+JWT_OAUTH2_AUTHORIZATION_URL = '<%= $authorization_url %>'
+JWT_OAUTH2_TOKEN_URL = '<%= $token_url %>'
+JWT_OAUTH2_EXTRA_TOKEN_PARAMS = {
+<% $extra_token_params.each |$attribute, $value| { -%>
+  '<%= $attribute %>': '<%= $value %>',
+<% } -%>
+}
+
+
+JWT_OAUTH2_CLIENT_ID = '<%= $client_id %>'
+JWT_OAUTH2_CLIENT_SECRET = '<%= $client_secret %>'
+
+# Algorithm for verifying JWT signatures (e.g. RS256, HS256)
+JWT_OAUTH2_RP_SIGN_ALGO = 'RS256'
+
+# If set to True, a new Django user will be created if one does not exist
+JWT_OAUTH2_CREATE_USER = True
+
+# Use this to define if the user can login.
+# List of tuples of (claim_name, expected_value). All must match.
+JWT_OAUTH2_REQUIRED_ACCESS_ATTRIBUTES = REQUIRED_ACCESS_ATTRIBUTES
+
+# Use this to assign the staff role based on claims returned by the IdP
+# List of tuples of (claim_name, expected_value). If ANY matches, the user is_staff will be set to True
+JWT_OAUTH2_STAFF_ATTRIBUTES = STAFF_ATTRIBUTES
+
+<% if $proxied { -%>
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+MIDDLEWARE = ['multipleproxy.middleware.MultipleProxyMiddleware'] + MIDDLEWARE
+<% } -%>

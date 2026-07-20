@@ -13,7 +13,7 @@ class metrix (
   String $cluster_name,
   String $subdomain,
   String $slurm_user = 'slurm',
-  Enum['ldap', 'saml2'] $auth_type = 'ldap',
+  Enum['ldap', 'saml2', 'oidc', 'oauth2jwt'] $auth_type = 'ldap',
   Array[Hash[String, String]] $staff_attributes = [],
   Array[Hash[String, String]] $required_access_attributes = [],
   Optional[String] $slurm_db_ip = undef,
@@ -26,6 +26,12 @@ class metrix (
     }
     'saml2': {
       include metrix::auth::saml2
+    }
+    'oidc': {
+      include metrix::auth::oidc
+    }
+    'oauth2jwt': {
+      include metrix::auth::oauth2jwt
     }
     default: {
       fail('Unsupported auth_type')
