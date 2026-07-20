@@ -8,23 +8,30 @@ LOGOUT_REDIRECT_URL = '/'
 # OpenID Connect Provider configurations:
 OIDC_OP_AUTHORIZATION_ENDPOINT = '<%= $authorization_endpoint %>'
 OIDC_OP_TOKEN_ENDPOINT = '<%= $token_endpoint %>'
-#OIDC_OP_USERINFO_ENDPOINT = 'https://your-idp.example.com/userinfo'
-#OIDC_OP_JWKS_ENDPOINT = 'https://your-idp.example.com/jwks'
+OIDC_OP_USER_ENDPOINT = '<%= $user_endpoint %>'
+OIDC_OP_JWKS_ENDPOINT = '<%= $jwks_endpoint %>'
+
+OIDC_TOKEN_USE_BASIC_AUTH = True
 
 OIDC_RP_CLIENT_ID = '<%= $client_id %>'
 OIDC_RP_CLIENT_SECRET = '<%= $client_secret %>'
+
+<% if $proxied { -%>
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+MIDDLEWARE = ['multipleproxy.middleware.MultipleProxyMiddleware'] + MIDDLEWARE
+<% } -%>
 
 # Algorithm for verifying JWT signatures (e.g. RS256, HS256)
 OIDC_RP_SIGN_ALGO = 'RS256'
 
 # Custom scopes if needed
-OIDC_RP_SCOPES = ['openid', 'email', 'profile']
-OIDC_RP_SCOPES += [
+OIDC_RP_SCOPES = 'openid '
+OIDC_RP_SCOPES += ' '.join([
 <% $extra_scopes.each |$scope| { -%>
   '<%= $scope %>',
 <% } -%>
-]
-OIDC_RP_CLIENT_CALLBACK_URL = 'https://metrix.evolo-dev.calculquebec.cloud/oidc/callback/'
+])
 
 # If set to True, a new Django user will be created if one does not exist
 OIDC_CREATE_USER = True
