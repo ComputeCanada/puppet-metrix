@@ -1,6 +1,6 @@
 class metrix::install (
+  String $version,
   String $source_url = "https://github.com/guilbaults/TrailblazingTurtle/archive/refs/tags/v${version}.tar.gz",
-  String $version = '1.8.0',
   String $python_version = '3.13',
 ) {
   $auth_type = lookup('metrix::auth_type')
