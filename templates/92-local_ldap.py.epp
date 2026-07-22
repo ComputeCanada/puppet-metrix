@@ -1,2 +1,4 @@
-AUTHENTICATION_BACKENDS += ['django_auth_ldap.backend.LDAPBackend']
+AUTHENTICATION_BACKENDS += ['userportal.authentication.staffLdapBackend']
 LOGIN_URL = '/accounts/login/' # So it does not use SAML2
+LDAP_CONFIG['required_access_attributes'] = REQUIRED_ACCESS_ATTRIBUTES
+LDAP_CONFIG['staff_attributes'] = STAFF_ATTRIBUTES
